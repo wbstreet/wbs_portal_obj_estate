@@ -1,7 +1,6 @@
 DROP TABLE IF EXISTS `{TABLE_PREFIX}mod_wbs_portal_obj_estate_apartment`;
 CREATE TABLE `{TABLE_PREFIX}mod_wbs_portal_obj_estate_apartment` (
-  `obj_id` int(11) NOT NULL AUTO_INCREMENT,
-  `owner_id` int(11) DEFAULT NULL,
+  `obj_id` int(11) NOT NULL,
   `partner_id` int(11) DEFAULT NULL,
   `settlement_id` int(11) NOT NULL,
   `category_id` int(11) NOT NULL,

@@ -15,6 +15,8 @@ if(!defined('WB_PATH')) {
         throw new IllegalFileException();
 }
 
+if (!file_exists(WB_PATH.'/modules/wbs_portal/lib.class.portal.php')) $admin->print_error('Модуль wbs_portal_obj_estate требует модуль wbs_portal');
+
 // create tables from sql dump file
 if (is_readable(__DIR__.'/install-struct.sql')) {
     $r = $database->SqlImport(__DIR__.'/install-struct.sql', TABLE_PREFIX, __FILE__ );
