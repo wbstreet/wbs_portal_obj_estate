@@ -6,7 +6,7 @@ $clsModPortalObjEstate = new ModPortalObjEstate($page_id, $section_id);
 if ($admin->is_authenticated()) {$is_auth = true;}
 else { $is_auth = false; }
 
-$modPortalArgs['apart_from'] = $clsFilter->f2($_GET, 'apart_from', [['variants', '', ['private', 'agency', 'all']]], 'default', 'all');
+$modPortalArgs['obj_from'] = $clsFilter->f2($_GET, 'obj_from', [['variants', '', ['private', 'agency', 'all', 'my']]], 'default', 'all');
 
 ?>
 
@@ -53,9 +53,12 @@ while ($aprt_categories !== null && $aprt_category = $aprt_categories->fetchRow(
 echo "</select> ";
 
 echo " <div class='btn-group'>";
-    echo "<input type='button' value='частные лица' onclick=\"set_params({apart_from:'private', page_num:1})\"".($modPortalArgs['apart_from'] == 'private' ? ' disabled' : '').">";
-    echo "<input type='button' value='агентства' onclick=\"set_params({apart_from:'agency', page_num:1})\"".($modPortalArgs['apart_from'] == 'agency' ? ' disabled' : '').">";
-    echo "<input type='button' value='все' onclick=\"set_params({apart_from:'all', page_num:1})\"".($modPortalArgs['apart_from'] == 'all' ? ' disabled' : '').">";
+    echo "<input type='button' value='частные лица' onclick=\"set_params({obj_from:'private', page_num:1})\"".($modPortalArgs['obj_from'] == 'private' ? ' disabled' : '').">";
+    echo "<input type='button' value='агентства' onclick=\"set_params({obj_from:'agency', page_num:1})\"".($modPortalArgs['obj_from'] == 'agency' ? ' disabled' : '').">";
+    echo "<input type='button' value='все' onclick=\"set_params({obj_from:'all', page_num:1})\"".($modPortalArgs['obj_from'] == 'all' ? ' disabled' : '').">";
+    if ($is_auth) {
+    echo "<input type='button' value='мои' onclick=\"set_params({obj_owner:'my', page_num:1})\"".($modPortalArgs['obj_owner'] == 'my' ? ' disabled' : '').">";
+    }
 echo "</div>";
 
 echo "</div>";
@@ -70,9 +73,12 @@ $common_opts = [
 	//'is_moder'=>1,
 	'is_deleted'=>0,
 	];
-if ($modPortalArgs['apart_from'] === 'private') $common_opts['partner_id'] = ['value'=>null];
-//else if ($modPortalArgs['apart_from'] === 'agency') $common_opts['user_owner_id'] = ['value'=>null];
-else if ($modPortalArgs['apart_from'] === 'agency') $common_opts['partner_id'] = ['value'=>null];
+if ($modPortalArgs['obj_from'] === 'private') $common_opts['partner_id'] = ['value'=>null];
+else if ($modPortalArgs['obj_from'] === 'agency') $common_opts['owner_id'] = ['value'=>null];
+else if ($modPortalArgs['obj_owner'] === 'my') {
+    $common_opts['owner_id'] = ['value'=>$admin->get_user_id()];
+    unset($common_opts['is_active']);
+}
 
 // вынимаем страницы
 $opts = array_merge($common_opts, [
@@ -125,8 +131,10 @@ while ($apartments !== null && $apartment = $apartments->fetchRow(MYSQLI_ASSOC))
     </div>
     ";
 
-	$text .= "
-	<div class='apartment'>
+    $active_class = $apartment['is_active'] === '0' ? ' apartment_nonactive' : '';
+    
+    $text .= "
+	<div class='apartment{$active_class}'>
         <a href='{$image_url}' class='fm'>
             <img class='apartment_image' src='{$preview_url}' align='left'>
         </a>
@@ -221,6 +229,10 @@ echo $text;
         background-color: #bbbbbbaa;
     }
 
+    .apartment.apartment_nonactive {
+        opacity: 0.5;
+    }
+    
     @media screen and (max-width: 420px) {
         .apartment .fm {
         	width:100%;
