@@ -7,11 +7,13 @@ include(__DIR__.'/../lib.class.portal_obj_estate.php');
 $clsModPortalObjEstate = new ModPortalObjEstate($page_id, $section_id);
 
 
+$apartment = null;
 if ($apartment_id !== null) {
-	//$apartment = $clsEstate->get_general_info($apartment_id);
-	//if (gettype($apartment) == 'string') print_error($apartment);
-	//if ($apartment === null) print_error('Объявление не найдено');
-} else { $apartment = null; }
+    $r = $clsModPortalObjEstate->get_apartment(['obj_id'=>$apartment_id]);
+    if (gettype($r) == 'string') $clsModPortalObjEstate->print_error($r);
+	else if ($r === null) $clsModPortalObjEstate->print_error('Объявление не найдено');
+    else $apartment = $r->fetchRow();
+}
 ?>
 
 <!--<input type='button' onclick="get_tab_content('estate', 'index')" value='<<< к списку' title='сделанные Вами изменеия НЕ сохраняься'>  &nbsp; &nbsp;-->

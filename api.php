@@ -38,7 +38,7 @@ if ($action == 'edit') {
 	    'address' => $clsFilter->f('address', [['1', 'Укажите адрес!'], ['mb_strCount', 'Разрешённая длина - 255 символов', 0,255]], 'append'),
 	    'description' => $clsFilter->f('description', [['1', 'Напишите описание!']], 'append'),
 
-        'is_active' => $clsFilter->f('is_active', [['variants', '', [['true', 'false']]]], 'default', 'true'),
+        'is_active' => $clsFilter->f('is_active', [['variants', '', ['true', 'false']]], 'default', 'true'),
 
 	    'floor' => $clsFilter->f('floor', [['1', 'Укажите этаж!'], ['float', 'Неверный формат этажа!']], in_array($category_id, [1, 5, 11, 13, 14, 15]) ? 'append' : 'default', 0),
 	    'floor_total' => $clsFilter->f('floor_total', [['1', 'Укажите всего этажей!']], in_array($category_id, [3, 8, 1, 13, 14, 15, 4, 5, 6, 11, 7, 9]) ? 'append' : 'default', 0),
@@ -48,21 +48,24 @@ if ($action == 'edit') {
 
 	    'lat' => $clsFilter->f('lat', [['float', 'Неверный формат широты!']], 'default', null),
 	    'lng' => $clsFilter->f('lng', [['float', 'Неверный формат долготы!']], 'default', null),
-	    'page_id'=>$page_id,
-	    'section_id'=>$section_id,
-	    'obj_type_id'=>$clsModPortalObjEstate->obj_type_id
     ];
-    $fields['is_active'] = $fields['is_active'] == 'true' ? '1' : '0';
+    $fields['is_active'] = $fields['is_active'] === 'true' ? 1 : 0;
 
     if ($clsFilter->is_error()) $clsFilter->print_error();
 
     if ($apartment_id === null) {
 
+        $fields = array_merge($fields, [
+    	    'page_id'=>$page_id,
+	        'section_id'=>$section_id,
+	        'obj_type_id'=>$clsModPortalObjEstate->obj_type_id
+	    ]);
+
         $fields['user_owner_id'] = $admin->get_user_id();
     	$apartment_id = $clsModPortalObjEstate->add_apartment($fields);
     	if (gettype($apartment_id) === 'string') print_error($apartment_id);
 
-	    print_success('Объявление успешно добавлено!');
+	    print_success('Объявление успешно добавлено!', ['absent_fields'=>[]]);
 
     } else {
     	
@@ -90,6 +93,11 @@ if ($action == 'edit') {
         	$r = $clsEstate->update_apartment($apartment_id, $_fields);
         	if (gettype($r) === 'string') print_error($r);
         } else print_is_changed($is_changed);*/
+    	$r = $clsModPortalObjEstate->update_apartment($apartment_id, $fields);
+    	if ($r !== true) print_error($r);
+
+	    print_success('Изменения сохранены!');
+
     }
 
 } else { print_error('Неверный apin name!'); }

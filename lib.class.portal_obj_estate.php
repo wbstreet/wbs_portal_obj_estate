@@ -91,10 +91,8 @@ class ModPortalObjEstate extends ModPortalObj {
 
 	    return check_select($sql);
 	}
-   
-   	function add_apartment($fields) {
-		global $database;
 
+    function split_arrays(&$fields) {
         $_fields = [];
         $f= "obj_id,page_id,section_id,obj_type_id,user_owner_id,is_active,is_deleted, moder_status,moder_comment,date_created,date_end_activity,substrate_color,substrate_opacity,substrate_border_color,substrate_border_left,substrate_border_right,bg_image";
         $common_fields = explode(',', $f);
@@ -103,6 +101,14 @@ class ModPortalObjEstate extends ModPortalObj {
             $_fields[$v] = $fields[$v];
             unset($fields[$v]);
         }
+        return $_fields;
+    }
+   
+   	function add_apartment($fields) {
+		global $database;
+
+
+        $_fields = $this->split_arrays($fields);
 
 		$r = insert_row($this->tbl_obj_settings, $_fields);
 		if ($r !== true) return "Неизвестная ошибка";
@@ -133,7 +139,7 @@ class ModPortalObjEstate extends ModPortalObj {
 		$where = [];
 
 		//$sql_builder->add_raw_where('1=1');
-		if (isset($sets['apartment_id'])) $where[] = '`obj_id`='.process_value($sets['apartment_id']);
+		if (isset($sets['obj_id'])) $where[] = "{$this->tbl_apartment}.`obj_id`=".process_value($sets['obj_id']);
 		//if (isset($sets['settlement_id']) && $sets['settlement_id'] !== null) $where[] = '`settlement_id`='.process_value($sets['settlement_id']);
 		if (isset($sets['category_id']) && $sets['category_id'] !== null) $where[] = "{$this->tbl_apartment}.`category_id`=".process_value($sets['category_id']);
 		if (isset($sets['external_id']) && $sets['external_id'] !== null) $where[] = "{$this->tbl_apartment}.`external_id`=".process_value($sets['external_id']);
@@ -200,7 +206,7 @@ class ModPortalObjEstate extends ModPortalObj {
         $select
         FROM {$this->tbl_apartment}, {$this->tbl_category}, {$this->tbl_obj_settings} WHERE $where $order $limit";
 
-        echo "<script>console.log(`".htmlentities($sql)."`);</script>";
+        //echo "<script>console.log(`".htmlentities($sql)."`);</script>";
 
         $r = $database->query($sql);
         if ($database->is_error()) return $database->get_error();
@@ -213,6 +219,29 @@ class ModPortalObjEstate extends ModPortalObj {
         	return $r;
         }
    	}
+   	
+   	function update_apartment($apartment_id, $fields) {
+		global $database;
+
+        $_fields = $this->split_arrays($fields);
+
+		$r = $this->get_apartment(['obj_id'=>$apartment_id]);
+		if (gettype($r) === 'string') return $r;
+		if ($r === null) return 'Объявление не найдено (id: '.$database->escapeString($apartment_id).')';
+
+
+        if ($_fields) {
+        	$r = update_row($this->tbl_obj_settings, $_fields, glue_fields(['obj_id'=>$apartment_id], 'AND'));
+	    	if ($r !== true) return $r;
+        }
+
+        if ($fields) {
+        	$r = update_row($this->tbl_apartment, $fields, glue_fields(['obj_id'=>$apartment_id], 'AND'));
+	    	if ($r !== true) return 'Неизвестная ошибка';
+        }
+        
+        return true;
+	}
 }
 }
 ?>

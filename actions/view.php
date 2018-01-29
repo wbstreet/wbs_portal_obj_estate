@@ -120,6 +120,11 @@ while ($apartments !== null && $apartment = $apartments->fetchRow(MYSQLI_ASSOC))
     else if ($price > 1000000) $price = ($price/1000000)." млн";
     else if ($price > 1000) $price = ($price/1000)." тыс";
 
+    $panel_edit = "<div class='apartment_panel_edit'>
+    <span onclick=\"set_params({action:'edit', obj_id:'{$apartment['obj_id']}'})\">Изменить</span>
+    </div>
+    ";
+
 	$text .= "
 	<div class='apartment'>
         <a href='{$image_url}' class='fm'>
@@ -136,6 +141,7 @@ while ($apartments !== null && $apartment = $apartments->fetchRow(MYSQLI_ASSOC))
 			<br>
 		    $category
 	    </div>
+	    $panel_edit
 	</div>
 	";
 	$x += 1;
@@ -179,6 +185,7 @@ echo $text;
    	    vertical-align: top;
    	    text-align:left;
    	    padding:5px;
+   	    position:relative;
     }
 
     .apartment .fm {
@@ -200,6 +207,20 @@ echo $text;
     	width: 47%;
     }
     
+    .apartment .apartment_panel_edit {
+        position:absolute;
+        bottom: 0;
+        right: 0;
+        background-color: #aaaaaaaa;
+    }
+    .apartment .apartment_panel_edit span {
+        display:inline-block;
+        cursor:pointer;
+    }
+    .apartment .apartment_panel_edit span:hover {
+        background-color: #bbbbbbaa;
+    }
+
     @media screen and (max-width: 420px) {
         .apartment .fm {
         	width:100%;
