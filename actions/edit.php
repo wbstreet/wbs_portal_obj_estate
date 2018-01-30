@@ -165,13 +165,24 @@ if ($apartment_id !== null) {
 			</td>
 		</tr>
 
+                <?php if ($apartment_id == null) { ?>
+                <tr>
+                    <td width="20%"><span style="text-align: right;">Защита от спама:</span></td>
+                    <td class='captcha'><?php call_captcha('image'); echo ' = '; call_captcha('input'); ?></td>
+                </tr>
+                <?php } ?>
+		
 	</table>
 
     <br><?php //$clsRecaptcha->show('show', true); ?>
 	
 	<br>
-	<input type="button" value='<?php echo $apartment_id == null ? 'Добавить объявление' : 'Сохранить изменения'; ?>' 
-	    onclick="sendform(this, 'edit', {<?php /*if (!$apartment_id) echo "func_success: function() {get_tab_content('estate', 'index');},";*/ ?> url: WB_URL+'/modules/wbs_portal_obj_estate/api.php'})">
+        <input type="button" value='<?php echo $apartment_id == null ? 'Добавить объявление' : 'Сохранить изменения'; ?>' 
+            onclick="sendform(this, 'edit', {
+                <?php /*if (!$apartment_id) echo "func_success: function() {get_tab_content('estate', 'index');},";*/ ?>
+                url: WB_URL+'/modules/wbs_portal_obj_estate/api.php',
+                wb_captcha_img:this.closest('form').querySelector('td.captcha img')
+            })">
 </form>
 
 <? } ?>

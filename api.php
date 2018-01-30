@@ -50,7 +50,8 @@ if ($action == 'edit') {
 	    'lng' => $clsFilter->f('lng', [['float', 'Неверный формат долготы!']], 'default', null),
     ];
     $fields['is_active'] = $fields['is_active'] === 'true' ? 1 : 0;
-
+    if ($apartment_id === null) $clsFilter->f('captcha', [['1', "Введите Защитный код!"], ['variants', "Введите Защитный код!", [$_SESSION['captcha']]]], 'append', '');
+    
     if ($clsFilter->is_error()) $clsFilter->print_error();
 
     if ($apartment_id === null) {
