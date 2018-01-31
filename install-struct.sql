@@ -36,3 +36,15 @@ CREATE TABLE `{TABLE_PREFIX}mod_wbs_portal_obj_estate_partner` (
   `partner_url` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`partner_id`)
 ){TABLE_ENGINE=MyISAM};
+
+DROP TABLE IF EXISTS `{TABLE_PREFIX}mod_wbs_portal_obj_estate_image`;
+CREATE TABLE `{TABLE_PREFIX}mod_wbs_portal_obj_estate_image` (
+  `image_id` int(11) NOT NULL AUTO_INCREMENT,
+  `obj_id` int(11) NOT NULL,
+  `image_storage_id` int(11) NOT NULL,
+  -- `image_name` varchar(100) NOT NULL,
+  -- `image_origin_name` varchar(255) NOT NULL,
+  `is_main` int(11) NOT NULL DEFAULT '0',
+  `is_active` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`image_id`)
+){TABLE_ENGINE=MyISAM};
