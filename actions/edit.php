@@ -201,9 +201,15 @@ if ($apartment_id !== null) {
                         </td>
                 </tr>
 
+                <tr>
+                    <td> Фотографии: </td>
+                    <td>
+                        <input name="photos[]" type="file" value="Добавить фотографии" onclick="" multiple accept=".png, .jpg, .jpeg">
+                    </td>
+                </tr>
+                
         <tr>
             <td colspan="2">
-                Фотографии:<br>
                 <div class='images'><nobr>
                     <?php
                     if ($r !== null && $apartment_id !== null) {
@@ -224,7 +230,6 @@ if ($apartment_id !== null) {
                     }
                     ?>
                 </nobr></div>
-                <input name="photos[]" type="file" value="Добавить фотографии" onclick="" multiple accept=".png, .jpg, .jpeg">
             </td>
         </tr>
 
