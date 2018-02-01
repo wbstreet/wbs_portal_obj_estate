@@ -219,7 +219,7 @@ if ($apartment_id !== null) {
                             while ($image = $r->fetchRow()) {
                                 $path = $clsStorageImg->get_without_db($image['md5'], $image['ext'], 'origin');
                                 echo "<div class ='image'>";
-                                echo "<img src=\"{$path}\" width='auto' height='180px'>";
+                                echo "<a class='fm' href='$path'><img src=\"{$path}\" width='auto' height='180px'></a>";
                                 echo "<div class='manage_panel'>
                                 <span onclick=\"sendform(this, '', {})\">Удилить</span>
                                 <span onclick=\"sendform(this, '', {})\">Сделать главной</span>
