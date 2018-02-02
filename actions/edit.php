@@ -184,10 +184,8 @@ if ($apartment_id !== null) {
                 </tr>
 
                 <tr>
-                        <td>
-                                Описапние:
-                        </td>
-                        <td>
+                        <td colspan="2">
+                                Описапние: <br>
                                 <textarea name='description' style ="width:100%;height:100px;"><?php echo $apartment_id == null ? '' : htmlentities($apartment['description']); ?></textarea>
                         </td>
                 </tr>
