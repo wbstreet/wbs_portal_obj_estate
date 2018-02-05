@@ -17,25 +17,18 @@ if(!defined('WB_PATH')) {
 
 if (!file_exists(WB_PATH.'/modules/wbs_portal/lib.class.portal.php')) $admin->print_error('Модуль wbs_portal_obj_estate требует модуль wbs_portal');
 
-// create tables from sql dump file
-if (is_readable(__DIR__.'/install-struct.sql')) {
-    $r = $database->SqlImport(__DIR__.'/install-struct.sql', TABLE_PREFIX, __FILE__ );
-    if ($database->is_error()) {
-        $admin->print_error($database->get_error());
-    }
-}
-if (is_readable(__DIR__.'/install-data.sql')) {
-    $r = $database->SqlImport(__DIR__.'/install-data.sql', TABLE_PREFIX, __FILE__ );
-    if ($database->is_error()) {
-        $admin->print_error($database->get_error());
-    }
-}
+$name = substr(basename(__DIR__), 4);
+$class_name = "Mod".ucfirst(str_replace('_', '', ucwords($name, '_'))); // portal_obj_blog into ModPortalObjBlog
 
-include(__DIR__.'/lib.class.portal_obj_estate.php');
-$clsModPortalObjEstate = new ModPortalObjEstate(null, null);
-$r = $clsModPortalObjEstate->install();
-if ($r !== true) {
-    $admin->print_error($r);
-}
+include(__DIR__."/lib.class.$name.php");
+$GLOBALS['cls'.$class_name] = new $class_name(null, null);
 
+$r = $GLOBALS['cls'.$class_name]->_import_sql(__FILE, 'struct');
+if ($r !== true) $admin->print_error($r);
+
+$r = $GLOBALS['cls'.$class_name]->_import_sql(__FILE, 'data');
+if ($r !== true) $admin->print_error($r);
+
+$r = $GLOBALS['cls'.$class_name]->install();
+if ($r !== true) $admin->print_error($r);
 ?>
