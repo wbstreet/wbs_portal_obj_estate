@@ -180,7 +180,7 @@ function get_apartment($sets=[], $only_count=false) {
 
         $where = implode(' AND ', $where);
 
-        $select = $only_count ? "COUNT(obj_id) AS count" : "*";/*"        {$this->tbl_apartment}.`apartment_id`,
+        $select = $only_count ? "COUNT({$this->tbl_apartment}.obj_id) AS count" : "*";/*"        {$this->tbl_apartment}.`apartment_id`,
         {$this->tbl_apartment}.`partner_id`,
         {$this->tbl_apartment}.`settlement_id`,
         {$this->tbl_apartment}.`category_id`,
@@ -220,7 +220,7 @@ function get_apartment($sets=[], $only_count=false) {
                 if ($r->numRows() === 0) return null;
                 return $r;
         }
-        }
+    }
         
     function update_apartment($apartment_id, $fields) {
         global $database;
