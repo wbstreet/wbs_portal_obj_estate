@@ -125,7 +125,7 @@ class ModPortalObjEstate extends ModPortalObj {
                 return $apartment_id;
         }
 
-function get_apartment($sets=[], $only_count=false) {
+function get_obj($sets=[], $only_count=false) {
         global $sql_builder, $database;
 
         $is_deleted = isset($sets['is_deleted']) ? $database->escapeString($sets['is_deleted']) : null;
@@ -227,7 +227,7 @@ function get_apartment($sets=[], $only_count=false) {
 
         $_fields = $this->split_arrays($fields);
 
-        $r = $this->get_apartment(['obj_id'=>$apartment_id]);
+        $r = $this->get_obj(['obj_id'=>$apartment_id]);
         if (gettype($r) === 'string') return $r;
         if ($r === null) return 'Объявление не найдено (id: '.$database->escapeString($apartment_id).')';
 

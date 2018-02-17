@@ -9,7 +9,7 @@ $clsModPortalObjEstate = new ModPortalObjEstate($page_id, $section_id);
 
 $apartment = null;
 if ($apartment_id !== null) {
-    $r = $clsModPortalObjEstate->get_apartment(['obj_id'=>$apartment_id]);
+    $r = $clsModPortalObjEstate->get_obj(['obj_id'=>$apartment_id]);
     if (gettype($r) == 'string') $clsModPortalObjEstate->print_error($r);
         else if ($r === null) $clsModPortalObjEstate->print_error('Объявление не найдено');
     else $apartment = $r->fetchRow();

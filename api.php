@@ -21,7 +21,7 @@ if ($action == 'edit') {
     $apartment_id = $clsFilter->f('apartment_id', [['integer', '']], 'default', null);
 
     if ($apartment_id !== null) {
-        /*$apartment = $clsEstate->get_apartment(['apartment_id'=>$apartment_id]);
+        /*$apartment = $clsEstate->get_obj(['apartment_id'=>$apartment_id]);
         if ($apartment === null) print_error('Такого объявления не существует!');
         if (gettype($apartment) === 'string') print_error($apartment);
         $apartment = $apartment->fetchRow();

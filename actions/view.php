@@ -12,15 +12,7 @@ $modPortalArgs['obj_owner'] = $clsFilter->f2($_GET, 'obj_owner', [['variants', '
 
 <?php if ($is_auth) { ?>
     <a href="?action=edit"><input type="button" value="Добавить объявление"></a>
-<?php } ?>
-
-<style>
-        input[disabled] {
-                background: rgb(222, 222, 222);
-        }
-</style>
-
-<?php
+<?php } 
 
 //if ($arrSettlement === null) {
 //      echo "Для корректного отображения недвижимости, пожалуйста выберите населённый пункт<br>";
@@ -86,14 +78,14 @@ $opts = array_merge($common_opts, [
         'limit_count'=>$modPortalArgs['obj_per_page'],
         'limit_offset'=>$modPortalArgs['obj_per_page'] * ($modPortalArgs['page_num']-1),
         ]);
-$apartments = $clsModPortalObjEstate->get_apartment($opts);
+$apartments = $clsModPortalObjEstate->get_obj($opts);
 if (gettype($apartments) == 'string') $clsModPortalObjEstate->print_error($apartments);
 
 // подсчитываем количество страниц
 $opts = array_merge($common_opts, [
         'find_str'=>$modPortalArgs['s'],
         ]);
-$count_pages = $clsModPortalObjEstate->get_apartment($opts, true) / $modPortalArgs['obj_per_page'];
+$count_pages = $clsModPortalObjEstate->get_obj($opts, true) / $modPortalArgs['obj_per_page'];
 if (strpos((string)$count_pages, '.') !== false) $count_pages = (integer)$count_pages + 1; 
 
 
