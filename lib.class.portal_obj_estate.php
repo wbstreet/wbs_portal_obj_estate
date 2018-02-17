@@ -125,29 +125,19 @@ class ModPortalObjEstate extends ModPortalObj {
                 return $apartment_id;
         }
 
-function get_obj($sets=[], $only_count=false) {
-        global $sql_builder, $database;
+    function get_obj($sets=[], $only_count=false) {
+        global $database;
 
-        $is_deleted = isset($sets['is_deleted']) ? $database->escapeString($sets['is_deleted']) : null;
-        $is_moder = isset($sets['is_moder']) ? $sets['is_moder'] : null;
-
-        if (isset($sets['limit_offset'])) $limit_offset = (integer)($sets['limit_offset']); else $limit_offset = null;
-        if (isset($sets['limit_count'])) $limit_count = (integer)($sets['limit_count']); else $limit_count = null;
-        if (isset($sets['find_str'])) $find_str = $database->escapeString($sets['find_str']); else $find_str = null;
-
-        $order_by = isset($sets['order_by']) ? glue_keys($sets['order_by']) : null;
-        $order_dir = isset($sets['order_dir']) ? $database->escapeString($sets['order_dir']) : null;
-
-        $where = [];
+        $where = [
+            "{$this->tbl_apartment}.`category_id`={$this->tbl_category}.`category_id`", // данные о категории и расширенные данные  всё равно получаем
+            "{$this->tbl_apartment}.`obj_id`={$this->tbl_obj_settings}.`obj_id`",
+            "{$this->tbl_obj_settings}.`obj_type_id`=".process_value($this->obj_type_id),
+        ];
+        $this->_getobj_where($sets, $where);
 
         //$sql_builder->add_raw_where('1=1');
-        if (isset($sets['obj_id'])) $where[] = "{$this->tbl_apartment}.`obj_id`=".process_value($sets['obj_id']);
-        //if (isset($sets['settlement_id']) && $sets['settlement_id'] !== null) $where[] = '`settlement_id`='.process_value($sets['settlement_id']);
         if (isset($sets['category_id']) && $sets['category_id'] !== null) $where[] = "{$this->tbl_apartment}.`category_id`=".process_value($sets['category_id']);
         if (isset($sets['external_id']) && $sets['external_id'] !== null) $where[] = "{$this->tbl_apartment}.`external_id`=".process_value($sets['external_id']);
-        if (isset($sets['is_active']) && $sets['is_active'] !== null) $where[] = "{$this->tbl_obj_settings}.`is_active`=".process_value($sets['is_active']);
-        if (isset($sets['is_moder']) && $sets['is_moder'] !== null) $where[] = "{$this->tbl_obj_settings}.`moder_status`=".process_value($sets['is_moder']);
-        if (isset($sets['is_deleted']) && $sets['is_deleted'] !== null) $where[] = "{$this->tbl_obj_settings}.`is_deleted`=".process_value($sets['is_deleted']);
 
         //if (isset($sets['owner_id'])) $where[] = "{$this->tbl_apartment}.`owner_id`=".process_value($sets['owner_id']);
         //if (isset($sets['partner_id'])) $where[] = "{$this->tbl_apartment}.`partner_id`=";
@@ -167,19 +157,13 @@ function get_obj($sets=[], $only_count=false) {
                 $where[] = $w.guess_operator($value).$value;
         }
 
+        if (isset($sets['find_str'])) $find_str = $database->escapeString($sets['find_str']); else $find_str = null;
         if ( $find_str !== null ) {
-                $find_str = str_replace('%', '\%', $find_str);
-                $find_like = "{$this->tbl_apartment}.`name` LIKE '%$find_str%'";
+            $find_str = str_replace('%', '\%', $find_str);
+            $where[] = "{$this->tbl_apartment}.`name` LIKE '%$find_str%'";
         }
 
-        // данные о категории и расширенные данные  всё равно получаем
-                $where[] = "{$this->tbl_apartment}.`category_id`={$this->tbl_category}.`category_id`";
-                //$where[] = "{$this->tbl_apartment}.`obj_id`={$this->tbl_obj_settings}.`obj_id` AND {$this->tbl_obj_settings}.`obj_type_id`={$this->tbl_obj_type}.`obj_type_id` AND {$this->tbl_obj_type}.`obj_type_latname`=".process_value($this->obj_type_latname);
-        $where[] = "{$this->tbl_apartment}.`obj_id`={$this->tbl_obj_settings}.`obj_id` AND {$this->tbl_obj_settings}.`obj_type_id`=".process_value($this->obj_type_id);
-                if ( $find_str !== null ) $where[] = "($find_like)";
-
         $where = implode(' AND ', $where);
-
         $select = $only_count ? "COUNT({$this->tbl_apartment}.obj_id) AS count" : "*";/*"        {$this->tbl_apartment}.`apartment_id`,
         {$this->tbl_apartment}.`partner_id`,
         {$this->tbl_apartment}.`settlement_id`,
@@ -196,30 +180,15 @@ function get_obj($sets=[], $only_count=false) {
         {$this->tbl_apartment}.`rooms`,
         {$this->tbl_apartment}.`external_id`,
         {$this->tbl_category}.`category_name`";*/
-
-        if ( $order_by !== null ) {
-                $order = " ORDER BY $order_by ";
-            if ( $order_dir !== null ) $order .= " $order_dir ";
-        } else $order = '';
-
-        $limit = build_limit($limit_offset, $limit_count);
+        $order_limit = $this->_getobj_order_limit($sets);
 
         $sql = "SELECT
         $select
-        FROM {$this->tbl_apartment}, {$this->tbl_category}, {$this->tbl_obj_settings} WHERE $where $order $limit";
+        FROM {$this->tbl_apartment}, {$this->tbl_category}, {$this->tbl_obj_settings} WHERE $where $order_limit";
 
         //echo "<script>console.log(`".htmlentities($sql)."`);</script>";
 
-        $r = $database->query($sql);
-        if ($database->is_error()) return $database->get_error();
-
-        if ($only_count) {
-                        $count = $r->fetchRow()['count'];
-                        return (integer)$count;
-        } else {
-                if ($r->numRows() === 0) return null;
-                return $r;
-        }
+        return $this->_getobj_return($sql, $only_count);
     }
         
     function update_apartment($apartment_id, $fields) {
