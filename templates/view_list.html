@@ -1,0 +1,127 @@
+{% import "macro.html" as wbs_macro %}
+
+{% if is_auth %}
+    <a href="?action=edit"><input type="button" value="Добавить объявление"></a>
+{% endif %}
+
+<div style='text-align:center;'>
+
+    <select onchange="set_params({'category_id':this.value, page_num:1})">
+        <option {% if modPortalArgs.category_id == null %}selected{% endif %} value=''>Все категории</option>
+        {% for obj_cat in obj_cats %}
+        <option value='{{ obj_cat.category_id }}' {% if modPortalArgs.category_id == obj_cat.category_id %}selected{% endif %}>{{ obj_cat.category_name }}</option>
+        {% endfor %}
+    </select>
+
+    <div class='btn-group'>
+        <input type='button' value='частные лица' onclick="set_params({obj_owner:'private', page_num:1})" {% if modPortalArgs.obj_owner == 'private' %}disabled{% endif %}>{#
+        #}<input type='button' value='агентства' onclick="set_params({obj_owner:'agency', page_num:1})" {% if modPortalArgs.obj_owner == 'agency' %}disabled{% endif %}>{#
+        #}<input type='button' value='все' onclick="set_params({obj_owner:'all', page_num:1})" {% if modPortalArgs.obj_owner == 'all' %}disabled{% endif %}>{#
+        #}{% if is_auth %}{#
+            #}<input type='button' value='мои' onclick="set_params({obj_owner:'my', page_num:1})" {% if modPortalArgs.obj_owner == 'my' %}disabled{% endif %}>
+        {% endif %}
+    </div>
+
+</div>
+
+<div style='text-align:center;'>
+    {% for obj in objs %}
+
+        <div class="apartment{% if obj.is_active == '0' %} apartment_nonactive{% endif %}">
+
+            <a href='{{ obj.orig_image }}' class='fm'>
+                <img class='apartment_image' src='{{ obj.preview_image }}' align='left'>
+            </a>
+
+            <div class='block_info'>
+
+                <a class='apartment_name' target='_blank' href='{{ obj.external_url }}'>{{ obj.name }}</a>
+                <br><br>
+                <div class='apartment_name' style='font-weight:500;'>Цена: {{ obj.price }}</div>
+
+                <span style='font-size:10pt;'>
+                    <div class='apartment_floor'>Площадь: {{ obj.square }} м<sup>2</sup></div>
+                </span>
+
+                <br>
+                {% if modPortalArgs.category_id == null %}
+                    <div class='apartment_category'>{{ obj.category_name }}</div><br>
+                {% endif %}
+
+            </div>
+
+            {% if can_edit %}
+                <div class='apartment_panel_edit'>
+                    <span onclick="set_params({action:'edit', obj_id:'{{ obj.obj_id }}'})">Изменить</span>
+                </div>
+            {% endif %}
+        </div>
+    
+    {% endfor %}
+</div>
+
+<br>
+{{ wbs_macro.paginator(divs, page_link, modPortalArgs) }}
+
+<style>
+    .apartment {
+        width: calc(100% - 10px);
+        max-width:490px;
+        font-size:12pt;
+        border: 1px solid #FFC68E;
+        background: #FFF8D4;
+        overflow:auto;
+            margin-top: 10px;
+            display: inline-block;
+            vertical-align: top;
+            text-align:left;
+            padding:5px;
+            position:relative;
+    }
+
+    .apartment .fm {
+        width:40%;
+        max-height: 150px;
+        overflow:hidden;
+            display: inline-block;
+            border-radius:5px;
+    }
+
+    .apartment .fm .apartment_image {
+        width: 100%;
+        margin:0;
+    }
+    
+    .apartment .block_info {
+        display:inline-block;
+        vertical-align:top;
+        width: 47%;
+    }
+    
+    .apartment .apartment_panel_edit {
+        position:absolute;
+        bottom: 0;
+        right: 0;
+        background-color: #aaaaaaaa;
+    }
+    .apartment .apartment_panel_edit span {
+        display:inline-block;
+        cursor:pointer;
+    }
+    .apartment .apartment_panel_edit span:hover {
+        background-color: #bbbbbbaa;
+    }
+    
+    .apartment.apartment_nonactive {
+        opacity: 0.5;
+    }
+
+    @media screen and (max-width: 420px) {
+        .apartment .fm {
+                width:100%;
+        }
+            .apartment .block_info {
+                width: 100%;
+            }
+    }
+</style>
