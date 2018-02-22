@@ -43,6 +43,7 @@ $fields = [
     //'is_moder'=>1,
     'is_deleted'=>0,
     'find_str'=>$modPortalArgs['s'],
+    'find_in'=>$modPortalArgs['s_in'],
 ];
 if ($modPortalArgs['obj_owner'] === 'private') $fields['partner_id'] = ['value'=>null];
 else if ($modPortalArgs['obj_owner'] === 'agency') $fields['owner_id'] = ['value'=>null];

@@ -94,18 +94,6 @@ class ModPortalObjEstate extends ModPortalObj {
             return check_select($sql);
     }
 
-    function split_arrays(&$fields) {
-        $_fields = [];
-        $f= "obj_id,page_id,section_id,obj_type_id,user_owner_id,is_active,is_deleted, moder_status,moder_comment,date_created,date_end_activity,substrate_color,substrate_opacity,substrate_border_color,substrate_border_left,substrate_border_right,bg_image";
-        $common_fields = explode(',', $f);
-        foreach ($common_fields as $k => $v) {
-            if (!in_array($v, array_keys($fields))) continue;
-            $_fields[$v] = $fields[$v];
-            unset($fields[$v]);
-        }
-        return $_fields;
-    }
-
     function add_apartment($fields) {
                 global $database;
 
@@ -157,11 +145,9 @@ class ModPortalObjEstate extends ModPortalObj {
                 $where[] = $w.guess_operator($value).$value;
         }
 
-        if (isset($sets['find_str'])) $find_str = $database->escapeString($sets['find_str']); else $find_str = null;
-        if ( $find_str !== null ) {
-            $find_str = str_replace('%', '\%', $find_str);
-            $where[] = "{$this->tbl_apartment}.`name` LIKE '%$find_str%'";
-        }
+        $find_keys = ['name'=>"{$this->tbl_apartment}.`name`", 'description'=>"{$this->tbl_apartment}.`description`"];
+        $where_find = $this->_getobj_search($sets, $find_keys);
+        if ($where_find) $where[] = $where_find;
 
         $where = implode(' AND ', $where);
         $select = $only_count ? "COUNT({$this->tbl_apartment}.obj_id) AS count" : "*";/*"        {$this->tbl_apartment}.`apartment_id`,
