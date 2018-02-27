@@ -100,7 +100,7 @@ class ModPortalObjEstate extends ModPortalObj {
                 return $apartment_id;
         }
 
-    function get_obj($sets=[], $only_count=false) {
+    /*function get_obj($sets=[], $only_count=false) {
         global $database;
 
         $where = [
@@ -115,12 +115,12 @@ class ModPortalObjEstate extends ModPortalObj {
         if (isset($sets['partner_id'])) $where[] = "{$this->tbl_apartment}.`partner_id`=".process_value($sets['partner_id']);
 
         $find_keys = ['name'=>"{$this->tbl_apartment}.`name`", 'description'=>"{$this->tbl_apartment}.`description`"];
-        $where_find = $this->_getobj_search($sets, $find_keys);
+        $where_find = getobj_search($sets, $find_keys);
         if ($where_find) $where[] = $where_find;
 
         $where = implode(' AND ', $where);
         $select = $only_count ? "COUNT({$this->tbl_apartment}.obj_id) AS count" : "*";
-        $order_limit = $this->_getobj_order_limit($sets);
+        $order_limit = getobj_order_limit($sets);
 
         $sql = "SELECT
         $select
@@ -128,9 +128,31 @@ class ModPortalObjEstate extends ModPortalObj {
 
         //echo "<script>console.log(`".htmlentities($sql)."`);</script>";
 
-        return $this->_getobj_return($sql, $only_count);
-    }
+        return getobj_return($sql, $only_count);
+    }*/
+
+    function get_obj($sets=[], $only_count=false) {
+
+        $tables = [$this->tbl_apartment, $this->tbl_category, $this->tbl_obj_settings];
+
+        $where = [
+            "{$this->tbl_apartment}.`category_id`={$this->tbl_category}.`category_id`", // данные о категории и расширенные данные  всё равно получаем
+            "{$this->tbl_apartment}.`obj_id`={$this->tbl_obj_settings}.`obj_id`",
+            "{$this->tbl_obj_settings}.`obj_type_id`=".process_value($this->obj_type_id),
+        ];
+        $this->_getobj_where($sets, $where);
         
+        $where_opts = [
+                'category_id'=>"{$this->tbl_apartment}.`category_id`",
+                'external_id'=>"{$this->tbl_apartment}.`external_id`",
+                'partner_id'=>"{$this->tbl_apartment}.`partner_id`",
+        ];
+        
+        $where_find = ['name'=>"{$this->tbl_apartment}.`name`", 'description'=>"{$this->tbl_apartment}.`description`"];
+        
+        return get_obj($tables, $where, $where_opts, $where_find, $sets, $only_count);
+    }
+    
     function update_apartment($apartment_id, $fields) {
         global $database;
 
