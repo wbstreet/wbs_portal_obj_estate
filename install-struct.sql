@@ -46,5 +46,8 @@ CREATE TABLE `{TABLE_PREFIX}mod_wbs_portal_obj_estate_image` (
   -- `image_origin_name` varchar(255) NOT NULL,
   `is_main` int(11) NOT NULL DEFAULT '0',
   `is_active` int(11) NOT NULL DEFAULT '1',
+  FOREIGN KEY (image_storage_id) REFERENCES {TABLE_PREFIX}mod_wbs_core_img(img_id)
+      ON UPDATE CASCADE
+      ON DELETE RESTRICT,
   PRIMARY KEY (`image_id`)
 ){TABLE_ENGINE=MyISAM};
