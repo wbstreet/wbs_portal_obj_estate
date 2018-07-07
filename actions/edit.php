@@ -214,7 +214,7 @@ if ($apartment_id !== null) {
                         $r = $clsModPortalObjEstate->get_image(['apartment_id'=>$apartment_id]);
                         if (gettype($r) === 'string') echo $r;//$clsModPortalObjEstate->print_eror($r);
                         else {
-                            while ($image = $r->fetchRow()) {
+                            while ($r !== null && $image = $r->fetchRow()) {
                                 $path = $clsStorageImg->get_without_db($image['md5'], $image['ext'], 'origin');
                                 echo "<div class ='image'>";
                                 echo "<a class='fm' href='$path'><img src=\"{$path}\" width='auto' height='180px'></a>";
